@@ -1,6 +1,7 @@
 {
-  "name": "dashboard-react",
+  "name": "inventory-management-admin",
   "private": true,
+  "author": "Rafiqul Bashar",
   "version": "0.0.0",
   "type": "module",
   "scripts": {

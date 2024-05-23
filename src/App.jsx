@@ -8,6 +8,7 @@ import Layout from "./components/Layout";
 function App() {
   return (
     <>
+      <h2>Bingo</h2>
       <Layout />
     </>
   );
