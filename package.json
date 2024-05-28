@@ -11,14 +11,16 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@tanstack/react-query": "^5.37.1",
     "axios": "^1.7.2",
+    "firebase": "^10.12.1",
+    "hamburger-menu": "^0.6.1",
+    "hamburger-react": "^2.5.1",
     "lucide-react": "^0.379.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-hook-form": "^7.51.5",
+    "react-firebase-hooks": "^5.1.1",
     "react-hot-toast": "^2.4.1",
-    "react-loader-spinner": "^6.1.6",
+    "react-router-dom": "^6.23.1",
     "zustand": "^4.5.2"
   },
   "devDependencies": {

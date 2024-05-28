@@ -1,4 +1,6 @@
-export const Header = () => {
+import { Link } from "react-router-dom";
+
+export const DashboardHeader = () => {
   return (
     <header>
       <div className="container bg-red-300 flex items-center">
@@ -7,16 +9,14 @@ export const Header = () => {
         </div>
         <div className="hidden md:block desktop_links">
           <div className="flex items-center gap-3 ">
-            <p>Home</p>
-            <p>Contact</p>
-            <p>About</p>
+            <Link to="/">Home</Link>
+            <Link to="/login">Login</Link>
           </div>
         </div>
         <div className="md:hidden mobile_menu">
           <div className="flex flex-col gap-3 ">
-            <p>Home</p>
-            <p>Contact</p>
-            <p>About</p>
+            <Link to="/">Home</Link>
+            <Link to="/login">Login</Link>
           </div>
         </div>
       </div>
