@@ -12,8 +12,10 @@ import EditProductPage from "src/pages/dashboardPages/EditProductPage";
 import SettingsPage from "src/pages/dashboardPages/SettingsPage";
 import NotFoundPage from "src/pages/publicPages/NotFoundPage";
 import PricingPage from "src/pages/publicPages/PricingPage";
-import ContactPage from "src/pages/publicPages/ContactPage";
 import MainLayout from "src/components/Common/MainLayout";
+import AboutUsPage from "src/pages/publicPages/AboutUsPage";
+import FAQPage from "src/pages/publicPages/FAQPage";
+import ProfilePage from "src/pages/dashboardPages/ProfilePage";
 
 export const router = createBrowserRouter([
   {
@@ -42,10 +44,19 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "/contact",
+        path: "/about-us",
         element: (
           <PublicRoute>
-            <ContactPage />
+            <AboutUsPage />
+          </PublicRoute>
+        ),
+      },
+
+      {
+        path: "/faq",
+        element: (
+          <PublicRoute>
+            <FAQPage />
           </PublicRoute>
         ),
       },
@@ -91,6 +102,10 @@ export const router = createBrowserRouter([
       {
         path: "edit-product/:id",
         element: <EditProductPage />,
+      },
+      {
+        path: "profile",
+        element: <ProfilePage />,
       },
       {
         path: "settings",

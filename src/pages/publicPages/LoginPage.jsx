@@ -28,84 +28,72 @@ export default function LoginPage() {
     return <LoadingSpinner />;
   }
   return (
-    <div className="mx-auto max-w-screen-xl px-4 py-16 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-lg">
-        <div className="flex items-center gap-3 mx-auto w-fit">
-          <img src="/logo.png" alt="app_logo" className="w-10 h-10" />
-          <h3 className="text-lg tracking-wide font-medium text-gray-700">
-            Ecomgrove
-          </h3>
-        </div>
-        <p className="mx-auto mt-4 max-w-md text-center text-gray-500 text-sm md:text-base">
-          Log in here to manage all your inventory in one place.
-        </p>
-
-        <form
-          onSubmit={handleEmailPasswordLogin}
-          className="mb-0 mt-6 space-y-4 rounded-lg p-4 shadow-lg sm:p-6 lg:p-8"
+    <div className="w-full max-w-md p-4 rounded shadow sm:p-8 mx-auto ">
+      <h2 className="mb-3 text-3xl font-semibold text-center">
+        Login to your account
+      </h2>
+      <p className="text-center text-gray-600">
+        Dont have account?
+        <Link
+          to="/register"
+          className="focus:underline hover:underline hover:text-orange-500 ml-2"
         >
-          <p className="text-center text-lg font-medium">
-            Sign in to your account
-          </p>
+          Sign up here
+        </Link>
+      </p>
+      <GoogleLogin />
 
-          <div>
-            <label htmlFor="email" className="sr-only">
-              Email
-            </label>
-
-            <input
-              type="email"
-              name="email"
-              required
-              className="w-full rounded-lg border-gray-200 p-4 pe-12 text-sm shadow-sm"
-              placeholder="Enter email"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="password" className="sr-only">
-              Password
-            </label>
-
-            <input
-              type="password"
-              name="password"
-              required
-              className="w-full rounded-lg border-gray-200 p-4 pe-12 text-sm shadow-sm"
-              placeholder="Enter password"
-            />
-          </div>
-          {error?.message && (
-            <p className="text-center text-red-500">{error?.message}</p>
-          )}
-          <button
-            type="submit"
-            className="block w-full rounded-lg bg-indigo-600 px-5 py-3 text-sm font-medium text-white hover:brightness-90 transition-all duration-200"
-          >
-            Sign in
-          </button>
-
-          <>
-            <GoogleLogin />
-          </>
-
-          <button
-            onClick={() =>
-              signInWithEmailAndPassword("test@mail.com", "test1234")
-            }
-            className="block w-full border rounded-lg border-indigo-600 px-5 py-3 text-sm font-medium  hover:bg-indigo-100 transition-all duration-150"
-          >
-            Demo Login
-          </button>
-
-          <p className="text-center text-gray-500">
-            Don&apos;t have any account ?{" "}
-            <Link to={"/register"} className="text-orange-500 underline">
-              Register here
-            </Link>
-          </p>
-        </form>
+      <div className="flex items-center w-full my-4">
+        <hr className="w-full  text-gray-600" />
+        <p className="px-3  text-gray-600">OR</p>
+        <hr className="w-full  text-gray-600" />
       </div>
+      <form onSubmit={handleEmailPasswordLogin} className="space-y-4">
+        <div className="space-y-2">
+          <label htmlFor="email" className="block text-gray-700">
+            Email address
+          </label>
+          <input
+            type="email"
+            name="email"
+            required
+            className="w-full p-3 border rounded border-gray-300 text-gray-800 focus:border-gray-800 focus:outline-none bg-gray-50"
+            placeholder="Enter email"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <label htmlFor="password" className="block text-gray-700">
+            Password
+          </label>
+
+          <input
+            type="password"
+            name="password"
+            required
+            className="w-full p-3 border rounded border-gray-300 text-gray-800 focus:border-gray-800 focus:outline-none bg-gray-50"
+            placeholder="*******"
+          />
+        </div>
+        {error?.message && (
+          <p className="text-center text-red-500">{error?.message}</p>
+        )}
+        <button
+          type="submit"
+          className="w-full bg-black text-white p-2 rounded hover:bg-gray-800 focus:outline-none focus:bg-black focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-colors duration-300"
+        >
+          Sign in
+        </button>
+
+        <button
+          onClick={() =>
+            signInWithEmailAndPassword("test@mail.com", "test1234")
+          }
+          className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-800 focus:outline-none focus:bg-black focus:ring-2 focus:ring-offset-2 focus:ring-blue-900 transition-colors duration-300"
+        >
+          Demo Login
+        </button>
+      </form>
     </div>
   );
 }
