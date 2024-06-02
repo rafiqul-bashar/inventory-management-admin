@@ -5,6 +5,7 @@ import { auth } from "src/firebase/firebase.config";
 
 export default function PublicRoute({ children }) {
   const [user, loading] = useAuthState(auth);
+
   if (loading) {
     return <LoadingSpinner />;
   }

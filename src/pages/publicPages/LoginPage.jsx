@@ -1,28 +1,50 @@
-import { useEffect } from "react";
 import { useSignInWithEmailAndPassword } from "react-firebase-hooks/auth";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import GoogleLogin from "src/components/Auth/GoogleLogin";
 import LoadingSpinner from "src/components/Common/LoadingSpinner";
 import { auth } from "src/firebase/firebase.config";
+import useAuthStore from "src/store/authStore";
+import axiosConf from "src/utils/axiosConf";
 
 export default function LoginPage() {
-  const [signInWithEmailAndPassword, user, loading, error] =
+  const [signInWithEmailAndPassword, loading, error] =
     useSignInWithEmailAndPassword(auth);
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (user) {
-      navigate("/dashboard", { replace: true });
-    }
-  }, [user, loading, navigate]);
+  const { setToken, saveUserData } = useAuthStore((state) => state);
 
   const handleEmailPasswordLogin = (e) => {
     e.preventDefault();
     const form = e.target;
     const email = form.email.value;
     const password = form.password.value;
+    signInWithEmailAndPassword(email, password).then(async (data) => {
+      if (data?.user?.email) {
+        const res = await axiosConf.post("/login", {
+          email: data?.user?.email,
+          name: data?.user?.displayName,
+          uid: data?.user?.uid,
+          displayPicture: data?.user?.photoURL,
+        });
+        await setToken(res?.data?.token);
+        await saveUserData(res?.data?.user);
+      }
+    });
+  };
 
-    signInWithEmailAndPassword(email, password);
+  const handleDemoLogin = async () => {
+    signInWithEmailAndPassword("test@mail.com", "test1234").then(
+      async (data) => {
+        if (data?.user?.email) {
+          const res = await axiosConf.post("/login", {
+            email: data?.user?.email,
+            name: data?.user?.displayName,
+            uid: data?.user?.uid,
+            displayPicture: data?.user?.photoURL,
+          });
+          await setToken(res?.data?.token);
+          await saveUserData(res?.data?.user);
+        }
+      }
+    );
   };
   if (loading) {
     return <LoadingSpinner />;
@@ -41,7 +63,7 @@ export default function LoginPage() {
           Sign up here
         </Link>
       </p>
-      <GoogleLogin />
+      <GoogleLogin page="login" />
 
       <div className="flex items-center w-full my-4">
         <hr className="w-full  text-gray-600" />
@@ -86,9 +108,7 @@ export default function LoginPage() {
         </button>
 
         <button
-          onClick={() =>
-            signInWithEmailAndPassword("test@mail.com", "test1234")
-          }
+          onClick={handleDemoLogin}
           className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-800 focus:outline-none focus:bg-black focus:ring-2 focus:ring-offset-2 focus:ring-blue-900 transition-colors duration-300"
         >
           Demo Login

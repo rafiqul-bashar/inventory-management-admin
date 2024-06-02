@@ -1,5 +1,5 @@
 import { useAuthState } from "react-firebase-hooks/auth";
-import { Navigate, useLocation } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import LoadingSpinner from "src/components/Common/LoadingSpinner";
 import { auth } from "src/firebase/firebase.config";
 

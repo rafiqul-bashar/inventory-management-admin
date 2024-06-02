@@ -1,15 +1,32 @@
-import { useSignInWithGoogle } from "react-firebase-hooks/auth";
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+
 import { auth } from "src/firebase/firebase.config";
-import LoadingSpinner from "../Common/LoadingSpinner";
+import useAuthStore from "src/store/authStore";
+import axiosConf from "src/utils/axiosConf";
 
 export default function GoogleLogin() {
-  const [signInWithGoogle, loading, error] = useSignInWithGoogle(auth);
-  if (loading) {
-    return <LoadingSpinner />;
-  }
+  const googleProvider = new GoogleAuthProvider();
+  const { setToken, saveUserData } = useAuthStore((state) => state);
+
+  const handleGoogleLogin = async () => {
+    await signInWithPopup(auth, googleProvider).then(async (data) => {
+      if (data?.user) {
+        const res = await axiosConf.post("/login", {
+          email: data?.user?.email,
+          name: data?.user?.displayName,
+          uid: data?.user?.uid,
+          displayPicture: data?.user?.photoURL,
+          google: true,
+        });
+        setToken(res?.data?.token);
+        saveUserData(res?.data?.user);
+      }
+    });
+  };
+
   return (
     <button
-      onClick={() => signInWithGoogle()}
+      onClick={handleGoogleLogin}
       aria-label="Login with Google"
       type="button"
       className="flex items-center justify-center w-full p-3 space-x-4 border-2 rounded-md focus:ring-2 focus:ring-offset-1 border-gray-600 my-8 hover:bg-gray-100 hover:border-blue-400  transition-all duration-300"

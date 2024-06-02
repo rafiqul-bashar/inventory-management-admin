@@ -5,23 +5,27 @@ import { Link, useNavigate } from "react-router-dom";
 import GoogleLogin from "src/components/Auth/GoogleLogin";
 import LoadingSpinner from "src/components/Common/LoadingSpinner";
 import { auth } from "src/firebase/firebase.config";
+import useAuthStore from "src/store/authStore";
+import axiosConf from "src/utils/axiosConf";
 
 export default function RegisterPage() {
   const [createUserWithEmailAndPassword, user, loading, error] =
     useCreateUserWithEmailAndPassword(auth);
 
   const navigate = useNavigate();
+  const { setToken, saveUserData } = useAuthStore((state) => state);
   let from = location.state?.from?.pathname || "/";
 
   useEffect(() => {
     if (user) {
-      navigate(from, { replace: true });
+      // navigate(from, { replace: true });
     }
   }, [user, loading, navigate, from]);
 
   const handleRegisterWithEmailPassword = (e) => {
     e.preventDefault();
     const form = e.target;
+    const name = form.name.value;
     const email = form.email.value;
     const password = form.password.value;
     const confirmPassword = form.confirmPassword.value;
@@ -29,7 +33,18 @@ export default function RegisterPage() {
     if (password !== confirmPassword) {
       toast.error("Password and Confirm Password doesn't match");
     } else {
-      createUserWithEmailAndPassword(email, password);
+      createUserWithEmailAndPassword(email, password).then(async (data) => {
+        if (data?.user?.email) {
+          const res = await axiosConf.post("/register", {
+            email: data?.user?.email,
+            name,
+            uid: data?.user?.uid,
+            displayPicture: data?.user?.photoURL,
+          });
+          await setToken(res?.data?.token);
+          await saveUserData(res?.data?.user);
+        }
+      });
     }
   };
   if (loading) {
@@ -46,7 +61,7 @@ export default function RegisterPage() {
           <h1 className="text-sm text-gray-600 text-center">
             Lorem ipsum dolor sit amet consectetur adipisicing elit.
           </h1>
-          <GoogleLogin />
+          <GoogleLogin page="register" />
           <div className="flex items-center w-full my-4">
             <hr className="w-full  text-gray-600" />
             <p className="px-3  text-gray-600">OR</p>
@@ -56,6 +71,18 @@ export default function RegisterPage() {
             onSubmit={handleRegisterWithEmailPassword}
             className="space-y-4"
           >
+            <div className="space-y-2">
+              <label htmlFor="name" className="block text-gray-700">
+                Name
+              </label>
+              <input
+                type="text"
+                name="name"
+                required
+                className="w-full p-3 border rounded border-gray-300 text-gray-800 focus:border-gray-800 focus:outline-none bg-gray-50"
+                placeholder="Enter your name"
+              />
+            </div>
             <div className="space-y-2">
               <label htmlFor="email" className="block text-gray-700">
                 Email address
