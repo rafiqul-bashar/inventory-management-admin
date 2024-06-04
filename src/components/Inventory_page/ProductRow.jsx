@@ -1,9 +1,29 @@
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import React from "react";
+import toast, { Toaster } from "react-hot-toast";
 import { Link } from "react-router-dom";
+import { deleteProduct } from "src/api/productApi";
 
 export default function ProductRow({ product }) {
+  const queryClient = useQueryClient();
+  const {
+    mutate,
+    isPending,
+    isError: isPostError,
+  } = useMutation({
+    mutationFn: deleteProduct,
+    retry: 3,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["products"],
+      });
+      toast.success("Deleted Product!");
+    },
+  });
+
   return (
     <tr>
+      <Toaster />
       <td className="px-6 py-4 whitespace-no-wrap text-sm leading-5">
         <div className="flex items-center gap-4">
           <img
@@ -23,7 +43,7 @@ export default function ProductRow({ product }) {
       <td className="px-6 py-4 whitespace-no-wrap text-sm leading-5">
         <div className="flex space-x-4">
           <Link
-            to={`/dashboard/edit-product/${product?.id}`}
+            to={`/dashboard/edit-product/${product._id}`}
             className="text-blue-500 hover:text-blue-600"
           >
             <svg
@@ -42,7 +62,10 @@ export default function ProductRow({ product }) {
             </svg>
             <p>Edit</p>
           </Link>
-          <button className="text-red-500 hover:text-red-600">
+          <button
+            onClick={() => mutate(product?._id)}
+            className="text-red-500 hover:text-red-600"
+          >
             <>
               <svg
                 xmlns="http://www.w3.org/2000/svg"

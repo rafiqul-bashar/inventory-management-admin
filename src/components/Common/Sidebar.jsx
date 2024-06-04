@@ -91,17 +91,16 @@ export const Sidebar = () => {
               </NavLink>
             </li>
           ))}
+
+          <button
+            onClick={logout}
+            className="flex items-center space-x-3 py-6  md:px-12  text-gray-100 bg-gray-700 hover:bg-gray-500 w-full"
+          >
+            <LogOutIcon className="w-6 h-6 ml-auto" />
+            <span className="hidden sm:block text-sm">Log Out</span>
+          </button>
         </ul>
       </nav>
-      <div className="bg-gray-800 mb-[30%]">
-        <button
-          onClick={logout}
-          className="flex items-center space-x-3 py-2  md:px-12  text-gray-100 mx-auto "
-        >
-          <LogOutIcon className="w-6 h-6 ml-auto" />
-          <span className="hidden sm:block text-sm">Log Out</span>
-        </button>
-      </div>
     </aside>
   );
 };

@@ -3,56 +3,77 @@ import { useCreateUserWithEmailAndPassword } from "react-firebase-hooks/auth";
 import toast, { Toaster } from "react-hot-toast";
 import { Link, useNavigate } from "react-router-dom";
 import GoogleLogin from "src/components/Auth/GoogleLogin";
+import Input from "src/components/Common/Input";
 import LoadingSpinner from "src/components/Common/LoadingSpinner";
 import { auth } from "src/firebase/firebase.config";
 import useAuthStore from "src/store/authStore";
-import axiosConf from "src/utils/axiosConf";
+import { useForm } from "react-hook-form";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { registerUserToDB } from "src/api/userApi";
+import { useMutation } from "@tanstack/react-query";
 
 export default function RegisterPage() {
   const [createUserWithEmailAndPassword, user, loading, error] =
     useCreateUserWithEmailAndPassword(auth);
 
-  const navigate = useNavigate();
   const { setToken, saveUserData } = useAuthStore((state) => state);
-  let from = location.state?.from?.pathname || "/";
+  const {
+    mutate,
 
-  useEffect(() => {
-    if (user) {
-      // navigate(from, { replace: true });
-    }
-  }, [user, loading, navigate, from]);
+    isError: isPostError,
+  } = useMutation({
+    mutationFn: registerUserToDB,
+    onSuccess: (data) => {
+      saveUserData(data?.user);
+      setToken(data?.token);
+    },
+  });
 
-  const handleRegisterWithEmailPassword = (e) => {
-    e.preventDefault();
-    const form = e.target;
-    const name = form.name.value;
-    const email = form.email.value;
-    const password = form.password.value;
-    const confirmPassword = form.confirmPassword.value;
+  const validationSchema = yup.object({
+    name: yup
+      .string()
+      .required("Name cannot be empty")
+      .min(5, "Doesn't looks like a good name"),
+    email: yup
+      .string()
+      .required("Email cannot be empty")
+      .email("Email looks like invalid"),
+    password: yup
+      .string()
+      .required("Password cannot be empty")
+      .min(8, "Password should be 8 characters minimum."),
+  });
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(validationSchema),
+  });
 
-    if (password !== confirmPassword) {
-      toast.error("Password and Confirm Password doesn't match");
-    } else {
-      createUserWithEmailAndPassword(email, password).then(async (data) => {
-        if (data?.user?.email) {
-          const res = await axiosConf.post("/register", {
-            email: data?.user?.email,
-            name,
-            uid: data?.user?.uid,
-            displayPicture: data?.user?.photoURL,
-          });
-          await setToken(res?.data?.token);
-          await saveUserData(res?.data?.user);
-        }
-      });
-    }
+  const onSubmit = ({ name, email, password }) => {
+    createUserWithEmailAndPassword(email, password).then(async (data) => {
+      if (data?.user) {
+        mutate({
+          email: data?.user?.email,
+          name,
+          uid: data?.user?.uid,
+          displayPicture:
+            data?.user?.photoURL ||
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRD41FVYIkCGUt1NV9V6FZ1vZx3NdcCK0QQPA&s",
+        });
+      }
+    });
+    // mutate();
   };
+
   if (loading) {
     return <LoadingSpinner />;
   }
   return (
     <section>
-      <Toaster position="bottom-right" />
+      <Toaster />
 
       {/* <!-- Right Pane --> */}
       <div className="w-full mx-auto  lg:w-1/2 flex items-center justify-center">
@@ -61,70 +82,27 @@ export default function RegisterPage() {
           <h1 className="text-sm text-gray-600 text-center">
             Lorem ipsum dolor sit amet consectetur adipisicing elit.
           </h1>
-          <GoogleLogin page="register" />
+          <GoogleLogin />
           <div className="flex items-center w-full my-4">
             <hr className="w-full  text-gray-600" />
             <p className="px-3  text-gray-600">OR</p>
             <hr className="w-full  text-gray-600" />
           </div>
-          <form
-            onSubmit={handleRegisterWithEmailPassword}
-            className="space-y-4"
-          >
-            <div className="space-y-2">
-              <label htmlFor="name" className="block text-gray-700">
-                Name
-              </label>
-              <input
-                type="text"
-                name="name"
-                required
-                className="w-full p-3 border rounded border-gray-300 text-gray-800 focus:border-gray-800 focus:outline-none bg-gray-50"
-                placeholder="Enter your name"
-              />
-            </div>
-            <div className="space-y-2">
-              <label htmlFor="email" className="block text-gray-700">
-                Email address
-              </label>
-              <input
-                type="email"
-                name="email"
-                required
-                className="w-full p-3 border rounded border-gray-300 text-gray-800 focus:border-gray-800 focus:outline-none bg-gray-50"
-                placeholder="Enter email"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <label htmlFor="password" className="block text-gray-700">
-                Password
-              </label>
-
-              <input
-                type="password"
-                name="password"
-                required
-                className="w-full p-3 border rounded border-gray-300 text-gray-800 focus:border-gray-800 focus:outline-none bg-gray-50"
-                placeholder="*******"
-              />
-            </div>
-            <div className="space-y-2">
-              <label htmlFor="password" className="block text-gray-700">
-                Confirm Password
-              </label>
-
-              <input
-                type="password"
-                name="confirmPassword"
-                required
-                className="w-full p-3 border rounded border-gray-300 text-gray-800 focus:border-gray-800 focus:outline-none bg-gray-50"
-                placeholder="*******"
-              />
-            </div>
-            {error?.message && (
-              <p className="text-center text-red-500">{error?.message}</p>
-            )}
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <Input label="name" register={register} error={errors?.name} />
+            <Input
+              label="email"
+              register={register}
+              error={errors?.email}
+              type="email"
+            />
+            <Input
+              label="password"
+              register={register}
+              error={errors?.password}
+              type="password"
+            />
+            {error && <span className="text-red-500">{error?.message}</span>}
 
             <button
               type="submit"

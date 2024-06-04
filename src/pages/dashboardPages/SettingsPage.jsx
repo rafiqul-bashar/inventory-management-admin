@@ -8,8 +8,8 @@ export default function SettingsPage() {
     <div>
       <div className="grid grid-cols-5 gap-8">
         <div className="col-span-5 xl:col-span-3">
-          <div className="rounded-sm border border-stroke bg-white shadow-default  border-strokedark  bg-boxdark">
-            <div className="border-b border-stroke py-4 px-7  border-strokedark">
+          <div className="rounded-sm border border-stroke bg-white shadow-default ">
+            <div className="border-b border-stroke py-4 px-7 ">
               <h3 className="font-medium text-black   ">
                 Personal Information
               </h3>
