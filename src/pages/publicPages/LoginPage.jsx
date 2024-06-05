@@ -65,7 +65,6 @@ export default function LoginPage() {
   });
 
   const onSubmit = ({ email, password }) => {
-    console.log(email, password);
     signInWithEmailAndPassword(email, password).then(async (data) => {
       console.log(data);
     });

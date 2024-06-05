@@ -18,11 +18,7 @@ export default function RegisterPage() {
     useCreateUserWithEmailAndPassword(auth);
 
   const { setToken, saveUserData } = useAuthStore((state) => state);
-  const {
-    mutate,
-
-    isError: isPostError,
-  } = useMutation({
+  const { mutate, isError: isPostError } = useMutation({
     mutationFn: registerUserToDB,
     onSuccess: (data) => {
       saveUserData(data?.user);
@@ -100,7 +96,7 @@ export default function RegisterPage() {
               label="password"
               register={register}
               error={errors?.password}
-              type="password"
+              type={"password"}
             />
             {error && <span className="text-red-500">{error?.message}</span>}
 

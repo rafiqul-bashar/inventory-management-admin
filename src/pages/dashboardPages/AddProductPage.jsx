@@ -76,7 +76,7 @@ export default function AddProductPage() {
   };
 
   return (
-    <div className=" flex flex-col gap-8 lg:w-1/2">
+    <div className=" flex flex-col gap-8 lg:w-1/2 px-4">
       <Toaster />
       <div className="border-b border-stroke py-4 px-7">
         <h3 className="font-medium text-black">Add New Product</h3>

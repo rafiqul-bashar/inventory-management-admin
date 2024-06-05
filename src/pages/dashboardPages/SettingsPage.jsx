@@ -1,8 +1,52 @@
-import React from "react";
-
+import { useEffect } from "react";
+import useAuthStore from "src/store/authStore";
+import { useForm } from "react-hook-form";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
+import Input from "src/components/Common/Input";
+import toast from "react-hot-toast";
+import { useMutation } from "@tanstack/react-query";
+import { updateUser } from "src/api/userApi";
 export default function SettingsPage() {
-  const handleForm = (e) => {
-    e.preventDefault();
+  const { userData, saveUserData } = useAuthStore((state) => state);
+
+  const validationSchema = yup.object({
+    name: yup.string().required("Name Title cannot be empty"),
+  });
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(validationSchema),
+    defaultValues: {
+      name: "",
+    },
+  });
+  //  update product
+  useEffect(() => {
+    if (userData?.email) {
+      setValue("name", userData.name);
+      setValue("email", userData.email);
+    }
+  }, [userData, setValue]);
+
+  const { mutate } = useMutation({
+    mutationFn: updateUser,
+
+    onSuccess: (data) => {
+      console.log(data);
+      saveUserData(data?.user);
+      toast.success("Updated User Success!");
+    },
+  });
+  const onSubmit = (data) => {
+    const formData = {
+      email: userData?.email,
+      name: data?.name,
+    };
+    mutate(formData);
   };
   return (
     <div>
@@ -15,83 +59,17 @@ export default function SettingsPage() {
               </h3>
             </div>
             <div className="p-6">
-              <form onSubmit={() => handleForm}>
-                <div className=" flex flex-col gap-5 sm:flex-row">
-                  <div className="w-full sm:w-1/2">
-                    <label
-                      className="mb-3 block text-sm font-medium text-black   "
-                      htmlFor="fullName"
-                    >
-                      Full Name
-                    </label>
-
-                    <input
-                      className="w-full rounded border border-stroke bg-gray p-3 text-black   focus-visible:outline-none"
-                      type="text"
-                      name="fullName"
-                      id="fullName"
-                      placeholder="Devid Jhon"
-                      defaultValue="Devid Jhon"
-                    />
-                  </div>
-
-                  <div className="w-full sm:w-1/2">
-                    <label
-                      className="mb-3 block text-sm font-medium text-black   "
-                      htmlFor="phoneNumber"
-                    >
-                      Phone Number
-                    </label>
-                    <input
-                      className="w-full rounded border border-stroke bg-gray p-3 text-black   focus-visible:outline-none"
-                      type="text"
-                      name="phoneNumber"
-                      id="phoneNumber"
-                      placeholder="+990 3343 7865"
-                      defaultValue="+990 3343 7865"
-                    />
-                  </div>
-                </div>
-                <br />
-                <div>
-                  <label
-                    className="mb-3 block text-sm font-medium text-black   "
-                    htmlFor="emailAddress"
-                  >
-                    Email Address
-                  </label>
-                  <input
-                    className="w-full rounded border border-stroke bg-gray p-3 text-black   focus-visible:outline-none"
-                    type="text"
-                    name="fullName"
-                    id="fullName"
-                    placeholder="Devid Jhon"
-                    defaultValue="Devid Jhon"
-                  />
-                </div>
-                <br />
-                <div className="mb-5 ">
-                  <label
-                    className="mb-3 block text-sm font-medium text-black   "
-                    htmlFor="Username"
-                  >
-                    Username
-                  </label>
-                  <input
-                    className="w-full rounded border border-stroke bg-gray p-3 text-black   focus-visible:outline-none"
-                    type="text"
-                    name="Username"
-                    id="Username"
-                    placeholder="devidjhon24"
-                    defaultValue="devidjhon24"
-                  />
-                </div>
-
-                <div className="flex justify-end gap-4 mt-4">
-                  <button
-                    className="flex justify-center rounded border border-stroke py-2 px-6 font-medium text-black hover:shadow-1  border-strokedark   "
-                    type="submit"
-                  >
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                <Input label="name" register={register} error={errors?.name} />
+                <Input
+                  disabled={true}
+                  label="email"
+                  register={register}
+                  error={errors?.name}
+                />
+                <p className="text-gray-600">*email cannot be changed</p>
+                <div className="flex items-center gap-4 pt-4">
+                  <button className="flex justify-center rounded border border-stroke py-2 px-6 font-medium text-black hover:shadow-1  border-strokedark   ">
                     Cancel
                   </button>
                   <button
@@ -105,19 +83,18 @@ export default function SettingsPage() {
             </div>
           </div>
         </div>
+
+        {/* photo section */}
         <div className="col-span-5 xl:col-span-2">
           <div className="rounded-sm border border-stroke bg-white shadow-default  border-strokedark  bg-boxdark">
             <div className="border-b border-stroke py-4 px-7  border-strokedark">
               <h3 className="font-medium text-black   ">Your Photo</h3>
             </div>
             <div className="p-7">
-              <form onSubmit={handleForm}>
+              <form>
                 <div className="mb-4 flex items-center gap-3">
                   <div className="h-14 w-14 rounded-full">
-                    <img
-                      src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ4XD7_BX8gEe9eGvr0FktdJ5dYmgxtBDXE9WQN7cwOTea2FNJ-5ls3ckVvZKg4ApJTF3o&usqp=CAU"
-                      alt="User"
-                    />
+                    <img src={userData.displayPicture} alt="User" />
                   </div>
                   <div>
                     <span className="mb-1  text-black   ">Edit your photo</span>

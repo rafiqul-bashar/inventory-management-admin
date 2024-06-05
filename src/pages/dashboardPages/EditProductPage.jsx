@@ -26,32 +26,12 @@ export default function EditProductPage() {
     setShowAlert(false);
   };
   const queryClient = useQueryClient();
-  const [formDefaults, setFormDefaults] = useState({
-    name: "",
-    price: 0,
-    description: "",
-    category: "",
-  });
 
   // get categories
   const { data: product } = useQuery({
     queryKey: ["singleProduct"],
     queryFn: () => fetchSingleProduct(id),
   });
-
-  useEffect(() => {
-    const checkAndSetProduct = () => {
-      if (product?._id) {
-        setFormDefaults({
-          name: product?.title,
-          price: product?.price,
-          description: product?.description,
-          category: product?.category,
-        });
-      }
-    };
-    checkAndSetProduct();
-  }, [id, product]);
 
   const validationSchema = yup.object({
     name: yup.string().required("Product Title cannot be empty"),
@@ -75,7 +55,12 @@ export default function EditProductPage() {
     formState: { errors },
   } = useForm({
     resolver: yupResolver(validationSchema),
-    defaultValues: formDefaults,
+    defaultValues: {
+      name: "",
+      price: 0,
+      description: "",
+      category: "",
+    },
   });
   //  update product
   useEffect(() => {

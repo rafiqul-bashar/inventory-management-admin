@@ -5,6 +5,7 @@ export default function Input({
   register = () => {},
   type = "text",
   error,
+  disabled,
 }) {
   return (
     <div className="space-y-2">
@@ -17,8 +18,9 @@ export default function Input({
       ) : (
         <input
           {...register(label)}
+          disabled={disabled}
           className="w-full p-2 border rounded border-gray-300 text-gray-800 focus:border-gray-800 focus:outline-none bg-gray-50"
-          type
+          type={type}
         />
       )}
       {error && <span className="text-red-500">{error?.message}</span>}

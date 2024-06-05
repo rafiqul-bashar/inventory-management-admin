@@ -16,8 +16,29 @@ import AddProductPage from "./pages/dashboardPages/AddProductPage";
 import EditProductPage from "./pages/dashboardPages/EditProductPage";
 import SettingsPage from "./pages/dashboardPages/SettingsPage";
 import ProfilePage from "./pages/dashboardPages/ProfilePage";
-
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth } from "src/firebase/firebase.config";
+import { useEffect } from "react";
+import { useMutation } from "@tanstack/react-query";
+import useAuthStore from "src/store/authStore";
+import { loginUserFromDB } from "src/api/userApi";
 export default function App() {
+  const [user] = useAuthState(auth);
+  const { setToken, saveUserData } = useAuthStore((state) => state);
+
+  const { mutate } = useMutation({
+    mutationFn: loginUserFromDB,
+    onSuccess: (data) => {
+      saveUserData(data?.user);
+      setToken(data?.token);
+    },
+  });
+
+  useEffect(() => {
+    if (user?.email) {
+      mutate({ email: user.email });
+    }
+  }, [user]);
   return (
     <Routes>
       {/* Public Routes */}
